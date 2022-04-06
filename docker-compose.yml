@@ -1,0 +1,31 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+version: '3.7'
+
+services:
+  rendertron:
+    build:
+      context: 'rendertron'
+    image: 'quay.io/tike/helsinki-fi-rendertron'
+    restart: 'unless-stopped'
+    networks:
+    - 'traefik'
+    environment:
+      TZ: '$TZ'
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.docker.network=traefik'
+    - 'traefik.http.routers.rendertron.rule=Host(`$HOSTNAME.$DOMAIN`)'
+    - 'traefik.http.routers.rendertron.entrypoints=web'
+    - 'traefik.http.routers.rendertron.middlewares=ipwhitelist@file,http-to-https@file'
+    - 'traefik.http.routers.rendertron.service=rendertron'
+    - 'traefik.http.routers.rendertron-secure.rule=Host(`$HOSTNAME.$DOMAIN`)'
+    - 'traefik.http.routers.rendertron-secure.entrypoints=websecure'
+    - 'traefik.http.routers.rendertron-secure.middlewares=ipwhitelist@file'
+    - 'traefik.http.routers.rendertron-secure.service=rendertron'
+    - 'traefik.http.services.rendertron.loadbalancer.passhostheader=true'
+
+networks:
+  traefik:
+    external: true

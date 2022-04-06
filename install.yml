@@ -1,0 +1,55 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+- hosts: "{{ target | mandatory }}"
+  become: true
+  roles:
+
+  # Docker
+  - name: "geerlingguy.docker"
+    vars:
+      docker_edition: "ce"
+      docker_install_compose: true
+      docker_service_enabled: true
+      docker_service_state: "started"
+      docker_restart_handler_state: "restarted"
+    when:
+    - "'docker' in group_names"
+    tags:
+    - "docker-install"
+
+  # Python 3 PIP Docker
+  - name: "geerlingguy.pip"
+    vars:
+      pip_package: "python3-pip"
+      pip_executable: "pip3"
+      pip_install_packages:
+      - name: "docker"
+        state: "latest"
+      - name: "docker-compose"
+        state: "latest"
+      - name: "docker-py"
+        state: "absent"
+    when:
+    - "'docker' in group_names"
+    tags:
+    - "pip"
+    - "docker"
+
+  # Watchtower
+  - name: "watchtower"
+    when:
+    - "'docker' in group_names"
+    tags:
+    - "watchtower"
+
+  # Traefik
+  - name: "traefik"
+    when:
+    - "'docker' in group_names"
+    - "traefik_domain is defined"
+    tags:
+    - "traefik"
+
+  # Rendertron
+  # @todo

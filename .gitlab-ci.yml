@@ -1,0 +1,27 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+# Load the jobs from split files
+include:
+- project: 'julkiset-sivut/gitlab'
+  ref: 'main'
+  file:
+  - '/workflow-mr.yml'
+  - '/docker.yml'
+  - '/trivy.yml'
+
+stages:
+- 'lint'
+- 'build'
+- 'scan'
+- 'push'
+- 'deploy'
+
+variables:
+  # CI account details
+  CI_REGISTRY: 'quay.io'
+  CI_REGISTRY_USERNAME: '${TIKE_ROBOT_USER_USERNAME}'
+  CI_REGISTRY_PASSWORD: '${TIKE_ROBOT_USER_PASSWORD}'
+
+  # Image names
+  DRUPAL_IMAGE: 'quay.io/tike/helsinki-fi-drupal'
+  DRUPAL_BUILD_IMAGE: 'quay.io/tike/helsinki-fi-drupal:build-${CI_PIPELINE_ID}'

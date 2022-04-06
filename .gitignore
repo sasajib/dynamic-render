@@ -1,0 +1,7 @@
+*.swp
+
+# Environment configuration, may include secrets
+.env
+
+# Ansible automatically installed
+ansible_collections
