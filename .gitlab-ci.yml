@@ -17,11 +17,23 @@ stages:
 - 'deploy'
 
 variables:
-  # CI account details
-  CI_REGISTRY: 'quay.io'
-  CI_REGISTRY_USERNAME: '${TIKE_ROBOT_USER_USERNAME}'
-  CI_REGISTRY_PASSWORD: '${TIKE_ROBOT_USER_PASSWORD}'
-
   # Image names
-  DRUPAL_IMAGE: 'quay.io/tike/helsinki-fi-drupal'
-  DRUPAL_BUILD_IMAGE: 'quay.io/tike/helsinki-fi-drupal:build-${CI_PIPELINE_ID}'
+  RENDERTRON_IMAGE: 'quay.io/tike/helsinki-fi-rendertron'
+  RENDERTRON_BUILD_IMAGE: 'quay.io/tike/helsinki-fi-rendertron:build-${CI_PIPELINE_ID}'
+  RENDERTRON_TARBALL: 'rendertron'
+
+build:rendertron:
+  extends: '.docker-build'
+  variables:
+    BUILD_IMAGE: '${RENDERTRON_BUILD_IMAGE}'
+    BUILD_DIR: 'rendertron'
+    DOCKERFILE: 'rendertron/Dockerfile'
+    TARBALL: '${RENDERTRON_TARBALL}'
+
+scan:trivy:rendertron:
+  needs:
+  - 'build:rendertron'
+
+  extends: '.trivy'
+  variables:
+    TRIVY_INPUT: '${RENDERTRON_TARBALL}.tar'
