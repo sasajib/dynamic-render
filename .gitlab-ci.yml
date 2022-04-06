@@ -3,7 +3,7 @@
 # Load the jobs from split files
 include:
 - project: 'julkiset-sivut/gitlab'
-  ref: 'main'
+  ref: 'master'
   file:
   - '/workflow-mr.yml'
   - '/docker.yml'
