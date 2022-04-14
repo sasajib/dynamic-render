@@ -1,0 +1,32 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+- name: "Log in to the Docker Registry"
+  community.docker.docker_login:
+    registry_url: "{{ rendertron_registry }}"
+    username: "{{ rendertron_registry_username }}"
+    password: "{{ rendertron_registry_password }}"
+
+- name: "Create the Rendertron container"
+  community.docker.docker_container:
+    container_default_behavior: "no_defaults"
+    name: "rendertron"
+    image: "{{ rendertron_image }}"
+    pull: true
+    detach: true
+    restart_policy: "always"
+    state: "started"
+    network_mode: "default"
+    networks:
+    - name: "traefik"
+    labels:
+      traefik.enable: "true"
+      traefi.docker.network: "traefik"
+      traefik.http.routers.rendertron.rule: "Host(`{{ inventory_hostname }}`)"
+      traefik.http.routers.rendertron.entrypoints: "web"
+      traefik.http.routers.rendertron.middlewares: "http-to-https@file"
+      traefik.http.routers.rendertron.service: "rendertron"
+      traefik.http.routers.rendertron-secure.rule: "Host(`{{ inventory_hostname }}`)"
+      traefik.http.routers.rendertron-secure.entrypoints: "websecure"
+      traefik.http.routers.rendertron-secure.service: "rendertron"
+      traefik.http.services.rendertron.loadbalancer.passhostheader: "true"

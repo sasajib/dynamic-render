@@ -1,0 +1,6 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+rendertron_image: "quay.io/tike/helsinki-fi-rendertron:latest"
+rendertron_registry: "quay.io"
+rendertron_registry_username: "tike+rendertron_deploy"
