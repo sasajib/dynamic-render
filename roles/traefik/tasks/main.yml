@@ -1,0 +1,47 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+- name: "Make sure the Traefik configuration folder exists"
+  file:
+    state: "directory"
+    recurse: true
+    path: "{{ traefik_config_path | mandatory }}/configs"
+
+- name: "Create the Traefik configuration"
+  template:
+    src: "traefik.yml"
+    dest: "{{ traefik_config_path | mandatory }}/traefik.yml"
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+
+- name: "Create the Traefik service configuration"
+  template:
+    src: "traefik-service.yml"
+    dest: "{{ traefik_config_path | mandatory }}/configs/traefik.yml"
+    variable_start_string: "<<"
+    variable_end_string: ">>"
+
+- name: "Create the Traefik network"
+  docker_network:
+    name: "traefik"
+
+- name: "Create the Traefik container"
+  docker_container:
+    container_default_behavior: "no_defaults"
+    name: "traefik"
+    image: "traefik"
+    pull: true
+    detach: true
+    restart_policy: "always"
+    state: "started"
+    volumes:
+    - "{{ traefik_config_path | mandatory }}/configs:/etc/traefik/configs:ro"
+    - "{{ traefik_config_path | mandatory }}/traefik.yml:/etc/traefik/traefik.yml:ro"
+    - "/etc/letsencrypt:/letsencrypt"
+    - "/run/docker.sock:/var/run/docker.sock"
+    network_mode: "default"
+    networks:
+    - name: "traefik"
+    ports:
+    - "80:80"
+    - "443:443"

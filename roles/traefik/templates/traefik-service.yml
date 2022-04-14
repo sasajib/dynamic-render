@@ -1,0 +1,29 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+http:
+  routers:
+    api:
+      rule: "Host(`<< traefik_domain | mandatory >>`) && (PathPrefix(`/traefik`) || PathPrefix(`/api`))"
+      service: "api@internal"
+      entryPoints:
+      - "web"
+      middlewares:
+      - "strip-traefik-prefix"
+      - "http-to-https"
+    api-secure:
+      rule: "Host(`<< traefik_domain | mandatory >>`) && (PathPrefix(`/traefik`) || PathPrefix(`/api`))"
+      service: "api@internal"
+      middlewares:
+      - "strip-traefik-prefix"
+      entryPoints:
+      - "websecure"
+  middlewares:
+    http-to-https:
+      redirectScheme:
+        scheme: "https"
+        permanent: true
+    strip-traefik-prefix:
+      stripPrefix:
+        prefixes:
+        - "/traefik"

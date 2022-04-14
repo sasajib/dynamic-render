@@ -45,9 +45,10 @@
 
   # Traefik
   - name: "traefik"
+    vars:
+      traefik_domain: "<< inventory_hostname >>"
     when:
     - "'docker' in group_names"
-    - "traefik_domain is defined"
     tags:
     - "traefik"
 
