@@ -77,6 +77,11 @@ COPY --from=build \
 	"/app/rendertron" \
 	"/app/rendertron"
 
+# Copy the configuration
+COPY \
+	"config.json" \
+	"/app/rendertron/config.json"
+
 # Set up the environment
 EXPOSE 3000
 WORKDIR "/app/rendertron"
