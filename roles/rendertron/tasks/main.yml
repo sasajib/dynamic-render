@@ -6,6 +6,10 @@
     registry_url: "{{ rendertron_registry }}"
     username: "{{ rendertron_registry_username }}"
     password: "{{ rendertron_registry_password }}"
+  when:
+  - "rendertron_registry is defined"
+  - "rendertron_registry_username is defined"
+  - "rendertron_registry_password is defined"
 
 - name: "Create the Rendertron container"
   community.docker.docker_container:
@@ -22,11 +26,20 @@
     labels:
       traefik.enable: "true"
       traefi.docker.network: "traefik"
-      traefik.http.routers.rendertron.rule: "Host(`{{ inventory_hostname }}`)"
+      traefik.http.routers.rendertron.rule: "Host(`{{ rendertron_hostname | default(inventory_hostname) }}`)"
       traefik.http.routers.rendertron.entrypoints: "web"
       traefik.http.routers.rendertron.middlewares: "http-to-https@file"
       traefik.http.routers.rendertron.service: "rendertron"
-      traefik.http.routers.rendertron-secure.rule: "Host(`{{ inventory_hostname }}`)"
+      traefik.http.routers.rendertron-secure.rule: "Host(`{{ rendertron_hostname | default(inventory_hostname) }}`)"
       traefik.http.routers.rendertron-secure.entrypoints: "websecure"
       traefik.http.routers.rendertron-secure.service: "rendertron"
       traefik.http.services.rendertron.loadbalancer.passhostheader: "true"
+  when:
+  - "rendertron_image is defined"
+
+- name: "Remove the Rendertron container"
+  community.docker.docker_container:
+    name: "rendertron"
+    state: "absent"
+  when:
+  - "rendertron_image is not defined"
