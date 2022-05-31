@@ -58,3 +58,10 @@
     - "'docker' in group_names"
     tags:
     - "rendertron"
+
+  # Prerender
+  - name: "prerender"
+    when:
+    - "'docker' in group_names"
+    tags:
+    - "prerender"

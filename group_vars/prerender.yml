@@ -1,0 +1,6 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+prerender_image: "quay.io/tike/helsinki-fi-prerender:latest"
+prerender_registry: "quay.io"
+prerender_registry_username: "tike+rendertron_deploy"

@@ -1,0 +1,45 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+- name: "Log in to the Docker Registry"
+  community.docker.docker_login:
+    registry_url: "{{ prerender_registry }}"
+    username: "{{ prerender_registry_username }}"
+    password: "{{ prerender_registry_password }}"
+  when:
+  - "prerender_registry is defined"
+  - "prerender_registry_username is defined"
+  - "prerender_registry_password is defined"
+
+- name: "Create the Prerender container"
+  community.docker.docker_container:
+    container_default_behavior: "no_defaults"
+    name: "prerender"
+    image: "{{ prerender_image }}"
+    pull: true
+    detach: true
+    restart_policy: "always"
+    state: "started"
+    network_mode: "default"
+    networks:
+    - name: "traefik"
+    labels:
+      traefik.enable: "true"
+      traefi.docker.network: "traefik"
+      traefik.http.routers.prerender.rule: "Host(`{{ prerender_hostname | default(inventory_hostname) }}`)"
+      traefik.http.routers.prerender.entrypoints: "web"
+      traefik.http.routers.prerender.middlewares: "http-to-https@file"
+      traefik.http.routers.prerender.service: "prerender"
+      traefik.http.routers.prerender-secure.rule: "Host(`{{ prerender_hostname | default(inventory_hostname) }}`)"
+      traefik.http.routers.prerender-secure.entrypoints: "websecure"
+      traefik.http.routers.prerender-secure.service: "prerender"
+      traefik.http.services.prerender.loadbalancer.passhostheader: "true"
+  when:
+  - "prerender_image is defined"
+
+- name: "Remove the Prerender container"
+  community.docker.docker_container:
+    name: "prerender"
+    state: "absent"
+  when:
+  - "prerender_image is not defined"
